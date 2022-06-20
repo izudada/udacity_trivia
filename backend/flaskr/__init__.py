@@ -29,6 +29,9 @@ def create_app(test_config=None):
     @TODO: Use the after_request decorator to set Access-Control-Allow
     """
     def pagination(request, selection):
+        """
+            A pagination function that paginates questions when querried for
+        """
         page = request.args.get("page", 1, type=int)
         start = (page - 1) * QUESTIONS_PER_PAGE
         end = start + QUESTIONS_PER_PAGE
@@ -40,6 +43,9 @@ def create_app(test_config=None):
 
     
     def get_all_category():
+        """
+            A function that gets all the avialble category 
+        """
         selection = Category.query.all()
         all_category = [category.format() for category in selection]
 
@@ -134,16 +140,11 @@ def create_app(test_config=None):
     Try using the word "title" to start.
     """
 
-    """
-    @TODO:
-    Create a GET endpoint to get questions based on category.
-
-    TEST: In the "List" tab / main screen, clicking on one of the
-    categories in the left column will cause only questions of that
-    category to be shown.
-    """
     @app.route('/categories/<int:id>/questions')
     def single_category(id):
+        """
+            A GET endpoint to get questions based on category.
+        """
         try:
             category = Category.query.get(id)
             category_questions = Question.query.filter(Question.category==id).order_by(Question.id).all()
