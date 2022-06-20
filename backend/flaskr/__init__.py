@@ -15,9 +15,6 @@ def create_app(test_config=None):
     setup_db(app)
     CORS(app)
 
-    """
-        @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-    """
     # CORS Headers 
     @app.after_request
     def after_request(response):
@@ -25,9 +22,6 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
-    """
-    @TODO: Use the after_request decorator to set Access-Control-Allow
-    """
     def pagination(request, selection):
         """
             A pagination function that paginates questions when querried for
@@ -51,13 +45,12 @@ def create_app(test_config=None):
 
         return all_category
         
-    """
-    @TODO:
-    Create an endpoint to handle GET requests
-    for all available categories.
-    """
     @app.route('/categories')
     def categories():
+        """
+            Create an endpoint to handle GET requests
+            for all available categories.
+        """
         try:
             all_categories = get_all_category()
 
@@ -72,22 +65,12 @@ def create_app(test_config=None):
         except Exception as e:
             abort(400)
 
-
-    """
-    @TODO:
-    Create an endpoint to handle GET requests for questions,
-    including pagination (every 10 questions).
-    This endpoint should return a list of questions,
-    number of total questions, current category, categories.
-
-    TEST: At this point, when you start the application
-    you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
-    Clicking on the page numbers should update the questions.
-    """
-
     @app.route('/questions', methods=['GET', 'POST'])
     def questions():
+        """
+            An endpoint to handle GET requests for questions,
+            including pagination (every 10 questions).
+        """
         try:
             if request.method == 'GET':
                 selection = Question.query.all()
