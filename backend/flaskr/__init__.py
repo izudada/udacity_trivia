@@ -43,13 +43,19 @@ def create_app(test_config=None):
     Create an endpoint to handle GET requests
     for all available categories.
     """
-    @app.route('/')
+    @app.route('/category')
     def categories():
-        # data = request.get_json()
-        # rating = data.get('rating', None)
-        return jsonify({
-            'success': "Book's rating updated successfully"
-        })
+        selection = Category.query.all()
+        current_questions = paginate_questions(request, selection)
+
+        if len(current_questions) == 0:
+            abort(404)
+
+        return jsonify(
+            {
+                "categories": current_questions
+            }
+        )
 
 
     """
