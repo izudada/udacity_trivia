@@ -28,11 +28,28 @@ def create_app(test_config=None):
     @TODO: Use the after_request decorator to set Access-Control-Allow
     """
 
+    def paginate_questions(request, selection):
+        page = request.args.get("page", 1, type=int)
+        start = (page - 1) * QUESTIONS_PER_PAGE
+        end = start + QUESTIONS_PER_PAGE
+
+        questions = [question.format() for question in selection]
+        current_questions = questions[start:end]
+
+        return current_questions
+
     """
     @TODO:
     Create an endpoint to handle GET requests
     for all available categories.
     """
+    @app.route('/')
+    def categories():
+        # data = request.get_json()
+        # rating = data.get('rating', None)
+        return jsonify({
+            'success': "Book's rating updated successfully"
+        })
 
 
     """
