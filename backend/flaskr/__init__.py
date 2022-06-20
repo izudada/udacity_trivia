@@ -41,9 +41,10 @@ def create_app(test_config=None):
     
     def get_all_category():
         selection = Category.query.all()
-        all_categories = pagination(request, selection)
+        all_category = [category.format() for category in selection]
 
-        return all_categories
+        return all_category
+        
     """
     @TODO:
     Create an endpoint to handle GET requests
@@ -86,7 +87,6 @@ def create_app(test_config=None):
                 selection = Question.query.all()
                 all_questions = pagination(request, selection)
                 all_category = get_all_category()
-                print(all_category, type(all_category))
 
                 if len(all_questions) == 0:
                     abort(404) 
@@ -100,6 +100,7 @@ def create_app(test_config=None):
                     }
                 )
         except Exception as e:
+            print(e)
             abort(400)
 
 
