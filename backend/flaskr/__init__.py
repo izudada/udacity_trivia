@@ -3,6 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
+import json
 
 from models import setup_db, Question, Category
 
@@ -27,8 +28,7 @@ def create_app(test_config=None):
     """
     @TODO: Use the after_request decorator to set Access-Control-Allow
     """
-
-    def paginate_questions(request, selection):
+    def pagination(request, selection):
         page = request.args.get("page", 1, type=int)
         start = (page - 1) * QUESTIONS_PER_PAGE
         end = start + QUESTIONS_PER_PAGE
@@ -38,24 +38,32 @@ def create_app(test_config=None):
 
         return current_questions
 
+    
+    def get_all_category():
+        selection = Category.query.all()
+        all_categories = pagination(request, selection)
+
+        return all_categories
     """
     @TODO:
     Create an endpoint to handle GET requests
     for all available categories.
     """
-    @app.route('/category')
+    @app.route('/categories')
     def categories():
-        selection = Category.query.all()
-        current_questions = paginate_questions(request, selection)
+        try:
+            all_categories = get_all_category()
 
-        if len(current_questions) == 0:
-            abort(404)
+            if len(all_categories) == 0:
+                abort(404)
 
-        return jsonify(
-            {
-                "categories": current_questions
-            }
-        )
+            return jsonify(
+                {
+                    "categories": all_categories
+                }
+            )
+        except Exception as e:
+            abort(400)
 
 
     """
@@ -70,6 +78,30 @@ def create_app(test_config=None):
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions.
     """
+
+    @app.route('/questions', methods=['GET', 'POST'])
+    def questions():
+        try:
+            if request.method == 'GET':
+                selection = Question.query.all()
+                all_questions = pagination(request, selection)
+                all_category = get_all_category()
+                print(all_category, type(all_category))
+
+                if len(all_questions) == 0:
+                    abort(404) 
+
+                return jsonify(
+                    {
+                        'questions': all_questions,
+                        'totalQuestions': len(Question.query.all()),
+                        'categories': all_category,
+                        'currentCategory': None
+                    }
+                )
+        except Exception as e:
+            abort(400)
+
 
     """
     @TODO:
