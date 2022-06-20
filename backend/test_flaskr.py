@@ -49,6 +49,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertAlmostEqual(res.status_code, 200)
         self.assertEqual(data['currentCategory'], None)
 
+    def test_a_category_of_questions(self):
+        res = self.client().get('/categories/1/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['currentCategory'])
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
