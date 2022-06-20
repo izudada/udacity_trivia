@@ -34,21 +34,20 @@ class TriviaTestCase(unittest.TestCase):
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
-    def test_paginated_category_for_failure(self):
-        res = self.client().get('/category')
-        print(res.data )
-        data = json.loads(res.data)
-
-        self.assertAlmostEqual(res.status_code, 404)
-        self.assertFalse(data['category'])
 
     def test_paginated_category_for_success(self):
-        res = self.client().get('/category')
-        print(res.data )
+        res = self.client().get('/categories')
         data = json.loads(res.data)
 
         self.assertAlmostEqual(res.status_code, 200)
-        self.assertTrue(data['category'])
+        self.assertTrue(data['categories'])
+
+    def test_questions_route_for_success(self):
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
+
+        self.assertAlmostEqual(res.status_code, 200)
+        self.assertEqual(data['currentCategory'], None)
 
 
 # Make the tests conveniently executable
