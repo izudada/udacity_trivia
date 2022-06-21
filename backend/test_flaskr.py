@@ -57,12 +57,25 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['currentCategory'])
 
     def test_delete_question_route(self):
+        # Note the question id used in this test hsould 
+        # be an existing question
         res = self.client().delete('/questions/5')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['message'])
         self.assertEquals(data['message'], "Question 5 was deleted successfully")
+
+    def test_quizzes_route(self):
+        res = self.client().post('/quizzes',  json={
+            'previous_questions': [5, 12],
+            'quiz_category': 4
+        })
+        data = json.loads(res.data)
+
+        self.assertEquals(res.status_code, 200)
+        self.assertTrue(data['question'])
+        self.assertEqual(len(data), 1)
 
 
 
