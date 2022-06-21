@@ -79,7 +79,8 @@ def create_app(test_config=None):
     def questions():
         """
             An endpoint to handle GET requests for questions,
-            including pagination (every 10 questions).
+            including pagination (every 10 questions);
+            and also to create or post a new question
         """
         try:
             if request.method == 'GET':
@@ -98,6 +99,24 @@ def create_app(test_config=None):
                         'currentCategory': None
                     }
                 )
+            else:
+                body = request.get_json()
+                question = body.get("question", None)
+                answer = body.get("answer", None)
+                difficulty = body.get("difficulty", None)
+                category = body.get("category", None)
+
+                if question and answer and difficulty and category:
+                    question = Question(
+                        question=question, answer=answer, difficulty=difficulty, category=category
+                        )
+                    question.insert()
+                    return jsonify({
+                        'success': True
+                    })
+                else:
+                    abort(404)
+
         except Exception as e:
             abort(400)
 
@@ -123,16 +142,6 @@ def create_app(test_config=None):
         except Exception as e:
             abort(400)
 
-    """
-    @TODO:
-    Create an endpoint to POST a new question,
-    which will require the question and answer text,
-    category, and difficulty score.
-
-    TEST: When you submit a question on the "Add" tab,
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.
-    """
 
     """
     @TODO:
