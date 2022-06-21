@@ -56,6 +56,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['currentCategory'])
 
+    def test_delete_question_route(self):
+        res = self.client().delete('/questions/5')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['message'])
+        self.assertEquals(data['message'], "Question 5 was deleted successfully")
+
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
