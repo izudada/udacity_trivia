@@ -44,7 +44,17 @@ def create_app(test_config=None):
         all_category = [category.format() for category in selection]
 
         return all_category
-        
+
+    
+    def sort_questions(question_list, prev):
+        """
+            A function to sort a list of questions
+        """
+        result = [ 
+            question.format() for question in question_list if question.id not in prev
+        ]
+        return result
+       
     @app.route('/categories')
     def categories():
         """
@@ -156,23 +166,34 @@ def create_app(test_config=None):
         except Exception as e:
             abort(400)
 
-    """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
+    @app.route('/quizzes', methods=['POST'])
+    def quizzes():
+        """
+            An POST endpoint to get questions to play the quiz.
+        """
+        question = {}
+        body = request.get_json()
 
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not.
-    """
+        previous_questions = body.get("previous_questions", None)
+        quiz_category = body.get("quiz_category", None)
 
-    """
-    @TODO:
-    Create error handlers for all expected errors
-    including 404 and 422.
-    """
+        try:
+            if quiz_category == None:
+                selection = Question.query.all()
+                all_questions = sort_questions(selection, previous_questions)
+                question = random.choice(all_questions)
+            else:
+                questions = Question.query.filter(Question.category==quiz_category).order_by(Question.id).all()
+                new_questions = sort_questions(questions, previous_questions)
+                question = random.choice(new_questions)
+            
+            return jsonify(
+                {
+                    'question': question
+                }
+            )
+        except Exception as e:
+            abort(400)
 
     @app.errorhandler(404)
     def not_found(error):
