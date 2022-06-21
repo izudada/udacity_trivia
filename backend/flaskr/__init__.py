@@ -80,10 +80,43 @@ def create_app(test_config=None):
         """
             An endpoint to handle GET requests for questions,
             including pagination (every 10 questions);
-            and also to create or post a new question
+            and also to POST a new question,
+            or search for a question.
         """
         try:
-            if request.method == 'GET':
+            if request.method == 'POST':
+                body = request.get_json()
+                question = body.get("question", None)
+                answer = body.get("answer", None)
+                difficulty = body.get("difficulty", None)
+                category = body.get("category", None)
+                search_term = body.get("searchTerm", None)
+
+                if search_term:
+                    questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
+                    all_questions = pagination(request, questions)
+                    all_category = get_all_category()
+
+                    return jsonify(
+                        {
+                            'questions': all_questions,
+                            'totalQuestions': len(Question.query.filter().all()),
+                            'currentCategory': None
+                        }
+                    )
+
+                elif question and answer and difficulty and category:
+                    question = Question(
+                        question=question, answer=answer, difficulty=difficulty, category=category
+                        )
+                    question.insert()
+                    return jsonify({
+                        'success': True
+                    })
+                else:
+                    abort(404)
+
+            else:
                 selection = Question.query.all()
                 all_questions = pagination(request, selection)
                 all_category = get_all_category()
@@ -99,25 +132,9 @@ def create_app(test_config=None):
                         'currentCategory': None
                     }
                 )
-            else:
-                body = request.get_json()
-                question = body.get("question", None)
-                answer = body.get("answer", None)
-                difficulty = body.get("difficulty", None)
-                category = body.get("category", None)
-
-                if question and answer and difficulty and category:
-                    question = Question(
-                        question=question, answer=answer, difficulty=difficulty, category=category
-                        )
-                    question.insert()
-                    return jsonify({
-                        'success': True
-                    })
-                else:
-                    abort(404)
 
         except Exception as e:
+            print(e)
             abort(400)
 
 
